@@ -1,7 +1,7 @@
 package cz.pedro.passman.engine;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -14,13 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 public class PasswordEngineImpl implements PasswordEngine {
 
 	@Override
-	public String generatePassword(int length, List<Character> characters)  {
-		final StringBuilder strBuilder = new StringBuilder();
+	public String generatePassword(int length, int maxOccurrence, List<Character> characters)  {
+		StringBuilder strBuilder = null;
 		try {
-			while(strBuilder.length() < length) {
-				final var randomIndex = SecureRandom.getInstance("SHA1PRNG").nextInt(length);
-				strBuilder.append(characters.get(randomIndex));
-			}
+			strBuilder = pickRandomChars(length, maxOccurrence, characters);
 		} catch(Exception e) {
 			log.error(e.getMessage());
 		}
@@ -29,37 +26,32 @@ public class PasswordEngineImpl implements PasswordEngine {
 		return result;
 	}
 	
-	@Override
-	public List<Character> pickRandomChars(int count, int maxOccurrence, List<Character> characters) throws UnreachablePrerequisitesException {
+	private StringBuilder pickRandomChars(int count, int maxOccurrence, List<Character> characters) throws UnreachablePrerequisitesException, NoSuchAlgorithmException {
 		
 		if (checkCountAgainstMaxOccurence(count, maxOccurrence, characters)) {
 			throw new UnreachablePrerequisitesException();
 		}
 		
-		List<Character> result = new ArrayList<>();
-		try {
-			final SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
-			while (result.size() < count) {
-				int nextIndex = secureRandom.nextInt(characters.size());
-				Character nextChar = characters.get(nextIndex);
-				if (getCharCount(nextChar, result) >= maxOccurrence) {
-					continue;
-				}
-				result.add(nextChar);
+		final StringBuilder strBuilder = new StringBuilder();
+		final SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+		while (strBuilder.length() < count) {
+			int nextIndex = secureRandom.nextInt(characters.size());
+			Character nextChar = characters.get(nextIndex);
+			if (getCharCount(nextChar, strBuilder.toString()) >= maxOccurrence) {
+				continue;
 			}
-		} catch (Exception e) {
-			log.error(e.getMessage());	
+			strBuilder.append(nextChar);
 		}
-		return result;
+		return strBuilder;
 	}
 	
 	private boolean checkCountAgainstMaxOccurence(int count, int maxOccurrence, List<Character> characters) {
-		return count / characters.size() > maxOccurrence;
+		return characters.isEmpty() || maxOccurrence <= 0 || count / characters.size() > maxOccurrence;
 	}
 	
-	private int getCharCount(Character pattern, List<Character> password) {
+	private int getCharCount(Character pattern, String password) {
 		int result = 0;
-		for (Character ch : password) {
+		for (Character ch : password.toCharArray()) {
 			if (ch.equals(pattern)) {
 				result++;
 			}

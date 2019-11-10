@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-
 import org.springframework.stereotype.Service;
 
 import com.google.common.primitives.Chars;
@@ -24,19 +23,16 @@ public class PasswordGenerationServiceImpl implements PasswordGenerationService 
 	
 	@Override
 	public String generatePassword(int length, Map<Set<Character>, Boolean> charsetMap) {
-		return passwordEngine.generatePassword(length, shuffle(getCharset(charsetMap)));
+		return passwordEngine.generatePassword(length, 3, shuffle(getCharacterList(charsetMap)));
 	}
 	
-	private List<Character> getCharset(Map<Set<Character>, Boolean> charsetMap) {
-		
+	private List<Character> getCharacterList(Map<Set<Character>, Boolean> charsetMap) {
 		List<Character> result = new ArrayList<>();
-		
 		for (Set<Character> charset : charsetMap.keySet()) {
 			if (charsetMap.get(charset)) {
 				result.addAll(charset);
 			}
 		}
-	
 		return result;
 	}
 	
