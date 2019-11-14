@@ -3,6 +3,7 @@ package cz.pedro.passman.engine;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -15,14 +16,14 @@ public class PasswordEngineImpl implements PasswordEngine {
 
 	@Override
 	public String generatePassword(int length, int maxOccurrence, List<Character> characters)  {
-		StringBuilder strBuilder = null;
+		StringBuilder strBuilder = new StringBuilder();
 		try {
 			strBuilder = pickRandomChars(length, maxOccurrence, characters);
 		} catch(Exception e) {
 			log.error(e.getMessage());
 		}
 		final var result = strBuilder.toString();
-		log.debug("PASSWORD: {}", result.toString());
+		log.debug("PASSWORD: {}", result);
 		return result;
 	}
 	
@@ -44,7 +45,7 @@ public class PasswordEngineImpl implements PasswordEngine {
 		}
 		return strBuilder;
 	}
-	
+
 	private boolean checkCountAgainstMaxOccurence(int count, int maxOccurrence, List<Character> characters) {
 		return characters.isEmpty() || maxOccurrence <= 0 || count / characters.size() > maxOccurrence;
 	}
