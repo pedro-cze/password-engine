@@ -36,7 +36,9 @@ public class PasswordGenerationController {
 		charsetMap.put(CharsetFactory.SPECIAL, passwordParams.isSpecial());
 		
 		final String password = passwordGenerationService.generatePassword(passwordParams.getLength(), charsetMap);
-		
+		if (password.isEmpty()) {
+		    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid input.");
+        }
 		return ResponseEntity
 				.status(HttpStatus.CREATED).body(password);
 	} 
