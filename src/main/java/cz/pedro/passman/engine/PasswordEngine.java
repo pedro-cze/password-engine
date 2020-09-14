@@ -16,16 +16,10 @@ public class PasswordEngine {
 
 	private static final String RANDOM_ALGO = "SHA1PRNG";
 
-	public String generatePassword(int length, int maxOccurrence, List<Character> characters)  {
-		StringBuilder strBuilder = new StringBuilder();
-		try {
-			strBuilder = pickRandomChars(length, maxOccurrence, characters);
-		} catch(Exception e) {
-			log.error(e.getMessage());
-		}
-		final var result = strBuilder.toString();
+	public String generatePassword(int length, int maxOccurrence, List<Character> characters) throws UnreachablePrerequisitesException, NoSuchAlgorithmException  {
+		final var result = pickRandomChars(length, maxOccurrence, characters);
 		log.debug("PASSWORD: {}", result);
-		return result;
+		return result.toString();
 	}
 	
 	private StringBuilder pickRandomChars(int count, int maxOccurrence, List<Character> characters) throws UnreachablePrerequisitesException, NoSuchAlgorithmException {
@@ -48,7 +42,7 @@ public class PasswordEngine {
 	}
 
 	private boolean checkCountAgainstMaxOccurence(int count, int maxOccurrence, List<Character> characters) {
-		return characters.isEmpty() || maxOccurrence <= 0 || count / characters.size() > maxOccurrence;
+		return characters.isEmpty() || maxOccurrence <= 0 || Math.floorDiv(count ,characters.size()) + 1 > maxOccurrence;
 	}
 	
 	private int getCharCount(Character pattern, String password) {

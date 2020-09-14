@@ -1,5 +1,6 @@
 package cz.pedro.passman.service.impl;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,8 @@ import java.util.Random;
 import java.util.Set;
 
 import cz.pedro.passman.engine.PasswordEngine;
+import cz.pedro.passman.exception.UnreachablePrerequisitesException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.google.common.primitives.Chars;
@@ -14,7 +17,7 @@ import com.google.common.primitives.Chars;
 import cz.pedro.passman.service.PasswordGenerationService;
 import lombok.RequiredArgsConstructor;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PasswordGenerationServiceImpl implements PasswordGenerationService {
@@ -23,7 +26,13 @@ public class PasswordGenerationServiceImpl implements PasswordGenerationService 
 
     @Override
     public String generatePassword(int length, Map<Set<Character>, Boolean> charsetMap) {
-        return passwordEngine.generatePassword(length, 3, shuffle(getCharacterList(charsetMap)));
+        String result = "";
+        try {
+            result = passwordEngine.generatePassword(length, 3, shuffle(getCharacterList(charsetMap)));
+        }  catch (UnreachablePrerequisitesException | NoSuchAlgorithmException e) {
+            log.error(e.getMessage());
+        }
+        return result;
     }
 
     private List<Character> getCharacterList(Map<Set<Character>, Boolean> charsetMap) {
