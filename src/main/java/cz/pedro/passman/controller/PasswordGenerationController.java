@@ -27,7 +27,7 @@ public class PasswordGenerationController {
 	
 	@PostMapping
 	public ResponseEntity<String> generatePassword(@RequestBody PasswordParams passwordParams) {
-		log.info("Generationg password for length: {}", passwordParams.getLength());
+		log.info("Generating password for length: {}", passwordParams.getLength());
 		
 		final Map<Set<Character>, Boolean> charsetMap = new HashMap<>();
 		charsetMap.put(CharsetFactory.LOWER, passwordParams.isLower());
