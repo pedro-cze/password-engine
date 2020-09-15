@@ -36,6 +36,10 @@ public class PasswordGenerationServiceImpl implements PasswordGenerationService 
     }
 
     private List<Character> getCharacterList(Map<Set<Character>, Boolean> charsetMap) {
+        if (charsetMap == null) {
+            log.error("Null charset.");
+            return List.of();
+        }
         List<Character> result = new ArrayList<>();
         for (Set<Character> charset : charsetMap.keySet()) {
             if (charsetMap.get(charset)) {
